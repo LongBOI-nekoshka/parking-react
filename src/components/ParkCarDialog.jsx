@@ -1,16 +1,19 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { Stack } from "@mui/system";
 import { useState } from "react";
-import { availalbePark, parkedCars } from "./store/appstore";
+import { availalbePark, parkedCars, history } from "./store/appstore";
 import { useRecoilState } from "recoil";
+import { differenceInMinutes } from "date-fns";
 
 const ParkCarDialog = (props) => {
     const { open, setOpen } = props
     const [size, setSize] = useState('s');
-    const [plateNumber, setPlateNumber] = useState();
+    const [plateNumber, setPlateNumber] = useState('');
     const [entrance, setEntrance] = useState(1);
     const [available, setAvalable] = useRecoilState(availalbePark);
+    const [hist,] = useRecoilState(history);
     const [parked, setParked] = useRecoilState(parkedCars);
+    const [disable, setDisable] = useState(false);
     
     const save = () => {
         let cloneAvailable = [...available];
@@ -36,6 +39,10 @@ const ParkCarDialog = (props) => {
             return changes;
         })
         setAvalable(cloneAvailable);
+        let checkIfHour = hist.filter((data) => {
+            return data.plateNumber == plateNumber && Math.round(differenceInMinutes(data.endDate,new Date() /60)) < 1
+        })
+        console.log(checkIfHour);
         setParked(parked => [...parked,{
             entrance:entrance,
             plateNumber:plateNumber,
@@ -79,27 +86,38 @@ const ParkCarDialog = (props) => {
                             label='Vehicle Size' 
                             labelId="size"
                             value={size}
-                            onChange={(event) => setSize(event.target.value)}
+                            onChange={(event) => {
+                                setSize(event.target.value)
+                            }}
                         >
                             <MenuItem value='s'>Small</MenuItem>
                             <MenuItem value='m'>Medium</MenuItem>
                             <MenuItem value='l'>Large</MenuItem>
                         </Select>
                     </FormControl>
-                    <TextField label='Plate Number' value={plateNumber} onChange={(event) => setPlateNumber(event.target.value)}/>
+                    <TextField 
+                        label='Plate Number' 
+                        value={plateNumber} 
+                        onChange={(event) =>{
+                            setPlateNumber(event.target.value)
+                            setDisable(parked.filter((data) => data.plateNumber == event.target.value).length >= 1)
+                        }}
+                    />
                     <TextField 
                         type='number' 
                         label='Entrance'
                         value={entrance}
                         onChange={(event) => {
                             if(event.target.value <= 3  && event.target.value >= 1 ) {
-                            setEntrance(event.target.value)
-                        }
+                                setEntrance(event.target.value)
+                            }
                     }}/>
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={save} variant='outlined'>
+                <Button onClick={save} variant='outlined' disabled={
+                    disable || plateNumber == ''
+                }>
                     Save
                 </Button>
                 <Button color='secondary' onClick={handleClose}>

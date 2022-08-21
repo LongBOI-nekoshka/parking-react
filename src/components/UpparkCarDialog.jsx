@@ -1,8 +1,9 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { format } from "date-fns";
 import { differenceInMinutes } from "date-fns/esm";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
@@ -15,10 +16,13 @@ const UnparkCarDialog = (props) => {
     const [available, setAvailalbe] = useRecoilState(availalbePark);
     const [, setHistory] = useRecoilState(history)
     const [selected, setSelected] = useState('');
+    const [unparkSummary, setSummary] = useState(null);
+
     const handleClose = () => {
         setOpen(false);
         setEndDate();
         setSelected('')
+        setSummary(null);
     };
 
     const save = () => {
@@ -61,6 +65,7 @@ const UnparkCarDialog = (props) => {
         cloneinfo.receipt.regularMultiplier = multiplier
         let total = cloneinfo.receipt.threehourRule + (5000 * penaltyMultiplier) + (cloneinfo.receipt.regularMultiplier * cloneinfo.receipt.regular );
         cloneinfo.receipt.total = total
+        setSummary(cloneinfo.receipt);
         setAvailalbe(cloneAvailable.map((data) => {
             let cloneData = {...data}
             if(cloneData.parkingNumber == selected) {
@@ -71,6 +76,7 @@ const UnparkCarDialog = (props) => {
         setHistory(parkHistory => [...parkHistory,cloneinfo])
         parkedClone.splice(indexClonePark,1)
         setParked(parkedClone)
+        setSelected('')
     };
 
     return (
@@ -121,11 +127,61 @@ const UnparkCarDialog = (props) => {
                             }
                         </Select>
                     </FormControl>
+                    {
+                        console.log(unparkSummary)
+                    }
+                    {
+                        unparkSummary ?  <>
+                        <Typography variant="caption">
+                            Time Started:
+                            {
+                                format(unparkSummary.dateStart,'MMMM dd, yyyy HH:ii:ss')
+                            }
+                        </Typography>
+                        <Typography variant="caption">
+                            Time ended:
+                            {
+                                format(unparkSummary.dateEnd,'MMMM dd, yyyy HH:ii:ss')
+                            }
+                        </Typography>
+                        <Typography variant="caption">
+                            Penalty Rate:
+                            {
+                                unparkSummary.penalty
+                            }
+                        </Typography>
+                        <Typography variant="caption">
+                            Penalty Multiplier:
+                            {
+                                unparkSummary.penaltyMultiplier
+                            }
+                        </Typography>
+                        <Typography variant="caption">
+                            Regular rate:
+                            {
+                                unparkSummary.regular
+                            }
+                        </Typography>
+                        <Typography variant="caption">
+                            Regular Multiplier:
+                            {
+                                unparkSummary.regularMultiplier
+                            }
+                        </Typography>
+                        <Typography variant="caption">
+                            Total:
+                            {
+                                unparkSummary.total
+                            }
+                        </Typography>
+                        </>
+                        :undefined
+                    }
                 </Stack>
             </DialogContent>
             <DialogActions>
                 <Button onClick={save} disabled={selected == ''}>
-                    Save
+                    Unpark
                 </Button>
                 <Button onClick={handleClose}>
                     Close
