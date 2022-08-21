@@ -26,7 +26,7 @@ export const availalbePark = atom({
     })
 })
 
-export const history = atom*({
+export const history = atom({
     key:'history',
     default:[]
 });
