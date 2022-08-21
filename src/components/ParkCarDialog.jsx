@@ -4,6 +4,7 @@ import { useState } from "react";
 import { availalbePark, parkedCars, history } from "./store/appstore";
 import { useRecoilState } from "recoil";
 import { differenceInMinutes } from "date-fns";
+import { Link, useNavigate } from "react-router-dom";
 
 const ParkCarDialog = (props) => {
     const { open, setOpen } = props
@@ -14,6 +15,7 @@ const ParkCarDialog = (props) => {
     const [hist,] = useRecoilState(history);
     const [parked, setParked] = useRecoilState(parkedCars);
     const [disable, setDisable] = useState(false);
+    const navigate = useNavigate();
     
     const save = () => {
         let cloneAvailable = [...available];
@@ -40,27 +42,56 @@ const ParkCarDialog = (props) => {
         })
         setAvalable(cloneAvailable);
         let checkIfHour = hist.filter((data) => {
-            return data.plateNumber == plateNumber && Math.round(differenceInMinutes(data.endDate,new Date() /60)) < 1
+            return data.plateNumber == plateNumber
         })
-        console.log(checkIfHour);
+        let last = 2;
+        if(checkIfHour.length != 0) {
+            last = Math.round(differenceInMinutes(new Date(),checkIfHour[checkIfHour.length - 1].dateEnd) / 60)
+        }
+        let shorter = canBeParked.filter((data,key) => {
+            return sortByShortest
+        })
+        console.log(canBeParked);
         setParked(parked => [...parked,{
             entrance:entrance,
             plateNumber:plateNumber,
             parkNumber:canBeParked[canBeParked.length - 1].parkingNumber,
             parkSize:canBeParked[canBeParked.length - 1].size,
-            dateStart: new Date(),
+            dateStart: last < 1 ? checkIfHour[checkIfHour.length - 1].dateEnd : new Date() ,
             dateEnd: null
         }]);
         handleClose();
-        // let shortest = sortByShortest(canBeParked)
     };
     
-    // const sortByShortest = (array) => {
-    //     let arrayClone = [...array]
-    //     arrayClone.sort((a,b) => {
-
-    //     })
-    // };
+    const sortByShortest = () => {
+        let ent = parseInt(entrance)
+        switch(ent) {
+            case 1:
+                return [
+                    6,5,13,12,4,20,3,
+                    11,19,2,10,18,1,
+                    9,17,0,8,16,7,15,14
+                ].reverse().map((data) => {
+                    return data+1
+                });
+            case 2:
+                return [
+                    13,6,20,12,5,19,11,
+                    4,18,10,3,17,9,2,16,
+                    8,1,15,7,0,14
+                ].reverse().map((data) => {
+                    return data+1
+                });
+            case 3:
+                return [
+                    20,19,13,18,12,6,
+                    17,11,5,16,10,4,15,
+                    9,3,14,8,2,7,1,0
+                ].reverse().map((data) => {
+                    return data+1
+                });
+        }
+    };
 
     const handleClose = () => {
         setOpen(false)

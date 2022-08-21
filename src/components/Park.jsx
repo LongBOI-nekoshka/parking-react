@@ -55,12 +55,6 @@ const Park = () => {
                 </Stack>
                 <ParkingSpace space={1}/>
             </Stack>
-            {/* <Button onClick={() => console.log(available)}>
-                Available
-            </Button>
-            <Button onClick={() => console.log(parked)}>
-                Parked
-            </Button> */}
            
         </Box>
     );

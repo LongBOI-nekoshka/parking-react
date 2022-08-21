@@ -128,9 +128,6 @@ const UnparkCarDialog = (props) => {
                         </Select>
                     </FormControl>
                     {
-                        console.log(unparkSummary)
-                    }
-                    {
                         unparkSummary ?  <>
                         <Typography variant="caption">
                             Time Started:
