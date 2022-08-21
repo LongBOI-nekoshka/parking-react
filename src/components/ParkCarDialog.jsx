@@ -70,6 +70,7 @@ const ParkCarDialog = (props) => {
             <DialogTitle>Car Details</DialogTitle>
             <DialogContent>
                 <Stack spacing={1} direction='column'>
+                        <br/>
                     <FormControl fullWidth>
                         <InputLabel id="size">
                             Vehicle Size 
