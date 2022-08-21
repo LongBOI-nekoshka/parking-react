@@ -1,0 +1,1 @@
+export default Test = () => <div>hakdog</div>;
