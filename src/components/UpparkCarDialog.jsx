@@ -13,9 +13,8 @@ const UnparkCarDialog = (props) => {
     const [endDate,setEndDate] = useState();
     const [parked, setParked] = useRecoilState(parkedCars)
     const [available, setAvailalbe] = useRecoilState(availalbePark);
-    const [parkHistory, setHistory] = useRecoilState(history)
+    const [, setHistory] = useRecoilState(history)
     const [selected, setSelected] = useState('');
-    
     const handleClose = () => {
         setOpen(false);
         setEndDate();
@@ -35,7 +34,6 @@ const UnparkCarDialog = (props) => {
         let hoursRendered = Math.round(differenceInMinutes(cloneinfo.dateEnd,cloneinfo.dateStart)/60);
         cloneinfo.receipt = {};
         cloneinfo.receipt.threehourRule = 40;
-        console.log(hoursRendered,cloneinfo.dateEnd,cloneinfo.dateStart);
         if(hoursRendered > 24) {
             penaltyMultiplier = Math.round(hoursRendered/24);
             multiplier =  hoursRendered - (24 * penaltyMultiplier - 1)
@@ -63,7 +61,6 @@ const UnparkCarDialog = (props) => {
         cloneinfo.receipt.regularMultiplier = multiplier
         let total = cloneinfo.receipt.threehourRule + (5000 * penaltyMultiplier) + (cloneinfo.receipt.regularMultiplier * cloneinfo.receipt.regular );
         cloneinfo.receipt.total = total
-        console.log(cloneinfo.receipt.total);
         setAvailalbe(cloneAvailable.map((data) => {
             let cloneData = {...data}
             if(cloneData.parkingNumber == selected) {
@@ -72,7 +69,7 @@ const UnparkCarDialog = (props) => {
             return cloneData;
         }))
         setHistory(parkHistory => [...parkHistory,cloneinfo])
-        parkedClone.splice(1,indexClonePark);
+        parkedClone.splice(indexClonePark,1)
         setParked(parkedClone)
     };
 
@@ -127,10 +124,10 @@ const UnparkCarDialog = (props) => {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={save}>
+                <Button onClick={save} disabled={selected == ''}>
                     Save
                 </Button>
-                <Button >
+                <Button onClick={handleClose}>
                     Close
                 </Button>
             </DialogActions>
