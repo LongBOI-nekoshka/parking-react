@@ -6,12 +6,14 @@ import { useEffect, useState } from "react";
 import { Box } from "@mui/system";
 import { format } from "date-fns/esm";
 import InfoIcon from '@mui/icons-material/Info';
+import { Link, useNavigate } from "react-router-dom";
 
 const History = () => {
     const [hist,] = useRecoilState(history);
     const [histClone, setClone] = useState();
     const [openDialog, setDialog] = useState(false);
     const [details, setDetails] = useState(false);
+    const navigate = useNavigate();
 
     useState(() => {
         let clone = [...hist];
